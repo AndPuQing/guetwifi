@@ -36,11 +36,11 @@ def get_args():
                         '--operator',
                         default='',
                         choices=['cmcc', 'telecom', 'unicom'],
-                        help='operator,cmcc、telecom、unicom')
+                        help='operator,cmcc,telecom,unicom')
     parser.add_argument('-d',
                         '--device',
                         default='pc',
-                        choices=['pc', 'phone'],
+                        choices=['pc','phone'],
                         help='Select the id of the login device')
     return parser.parse_args()
 
