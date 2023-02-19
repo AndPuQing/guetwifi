@@ -1,19 +1,21 @@
-## GUET-WIFI 自动登录
+## GUET-WIFI Auto Login
 
-### 使用说明
+### Usage
 
-导入requests库
-按如下填入参数
+#### Linux
 
--a：账号
+First, install the package:
 
--p：密码
+```bash
+pip install guetwifi
+```
 
--o：运营商（可选，默认校园网）[cmcc,telecom,unicom]
+Then, run the command in terminal:
 
--d：设备（可选，默认pc端）[pc,phone]
+```bash
+guetwifi start
+```
 
-### 异常说明
+#### Windows
 
-- 出现AC校验失败->重连网络
-- 账号已登录->已有相同ip上线，在管理系统退出登录
+> Please use the Windows Subsystem for Linux (WSL) to run this program.
