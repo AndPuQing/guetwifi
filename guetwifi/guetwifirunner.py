@@ -4,7 +4,9 @@ import time
 import logging
 import os
 import json
-
+import platform
+import subprocess
+import click
 _path = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -42,7 +44,7 @@ class NetWork:
                     self.password = config["password"]
                     self.operator = config["operator"]
                 except KeyError:
-                    raise KeyError("Config file error")
+                    click.echo("Please config your account and password")
 
     def _getParams(self):
         URL = "http://www.msftconnecttest.com/connecttest.txt"
@@ -103,21 +105,11 @@ class NetWork:
 
     @staticmethod
     def checkNet():
-        URL = "http://www.msftconnecttest.com/connecttest.txt"
-        HEADERS = {
-            "Connection": "Close",
-            "User-Agent": "Microsoft NCSI",
-            "Host": "www.msftconnecttest.com",
-        }
-        res = requests.get(URL, headers=HEADERS, allow_redirects=False)
-        html = res.text
-        pattern = r"Microsoft Connect Test"
-        m = re.search(pattern, html)
-        if m:
-            return True
-        else:
-            return False
-
+        # ping www.baidu.com
+        command = "ping -c 5 www.baidu.com" if platform.system() == "Darwin" else "ping -n 5 www.baidu.com"
+        res = subprocess.run(command, shell=True)
+        return res.returncode == 0
+    
     def run(self):
         while True:
             if not self.checkNet():

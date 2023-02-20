@@ -1,2 +1,8 @@
 *.json
 *.log
+*.pyc
+
+# Python build
+build/
+develop-eggs/
+dist/

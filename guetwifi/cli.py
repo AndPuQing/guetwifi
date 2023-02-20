@@ -6,26 +6,49 @@ import psutil
 import click
 import os
 import json
-
-__version__ = "0.1.0"
+import importlib.metadata as metadata
+__version__ = metadata.version("guetwifi")
 _path = os.path.dirname(os.path.abspath(__file__))
+_runner = "guetwifirunner"
 
 
-def _start():
-    cmd = "python {}/GuetWifiRunner.py".format(_path)
-    subprocess.Popen(cmd, shell=True)
-
-
-def _stop():
+def _get_pid():
+    runner_pids = []
     for proc in psutil.process_iter():
         try:
             pinfo = proc.as_dict(attrs=["pid", "cmdline"])
             cmdline = "".join(pinfo["cmdline"])
-            if "GuetWifiRunner" in cmdline:
-                p = psutil.Process(pinfo["pid"])
-                p.terminate()
+            if _runner in cmdline:
+                runner_pids.append(pinfo["pid"])
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
+    return runner_pids
+
+def _start():
+    runner_pids = _get_pid()
+    if runner_pids:
+        click.echo("guetwifi is already running")
+        return
+    else:
+        cmd = "python -m guetwifi.{}".format(_runner)
+        subprocess.Popen(cmd, shell=True)
+        runner_pids = _get_pid()
+        if runner_pids:
+            click.echo("guetwifi started")
+        else:
+            click.echo("guetwifi start failed")
+
+
+def _stop():
+    runner_pids = _get_pid()
+    if not runner_pids:
+        click.echo("guetwifi is not running")
+        return
+    else:
+        for pid in runner_pids:
+            p = psutil.Process(pid)
+            p.terminate()
+        click.echo("guetwifi stopped")
 
 
 @click.group()
@@ -43,6 +66,7 @@ def guetwifi(ctx, debug):
 @click.pass_context
 def start(ctx):
     """Start guetwifi"""
+    # TODO: enable debug mode
     click.echo("Start guetwifi...")
     _start()
 
@@ -117,6 +141,8 @@ def config(account, password, operator):
     with open(config_path, "w") as f:
         json.dump(config, f)
 
+def main():
+    guetwifi()
 
 if __name__ == "__main__":
     guetwifi()
