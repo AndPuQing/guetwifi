@@ -111,17 +111,17 @@ def status():
 def upgrade():
     """Upgrade guetwifi"""
     click.echo("Upgrade guetwifi...")
-    stop()
+    _stop()
     cmd = "pip install guetwifi --upgrade"
     subprocess.Popen(cmd, shell=True)
-    start()
+    _start()
 
 
 @guetwifi.command()
 def uninstall():
     """Uninstall guetwifi"""
     click.echo("Uninstall guetwifi...")
-    stop()
+    _stop()
     cmd = "pip uninstall guetwifi"
     subprocess.Popen(cmd, shell=True)
 
