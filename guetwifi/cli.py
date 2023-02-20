@@ -7,6 +7,7 @@ import click
 import os
 import json
 import importlib.metadata as metadata
+
 __version__ = metadata.version("guetwifi")
 _path = os.path.dirname(os.path.abspath(__file__))
 _runner = "guetwifirunner"
@@ -23,6 +24,7 @@ def _get_pid():
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return runner_pids
+
 
 def _start():
     runner_pids = _get_pid()
@@ -48,6 +50,7 @@ def _stop():
         for pid in runner_pids:
             p = psutil.Process(pid)
             p.terminate()
+            click.echo("terminate pid: {}".format(pid))
         click.echo("guetwifi stopped")
 
 
@@ -95,35 +98,28 @@ def version():
 @guetwifi.command()
 def status():
     """Check guetwifi status"""
-    for proc in psutil.process_iter():
-        try:
-            pinfo = proc.as_dict(attrs=["pid", "cmdline"])
-            cmdline = "".join(pinfo["cmdline"])
-            if "GuetWifiRunner" in cmdline:
-                click.echo("guetwifi is running")
-                return
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-    click.echo("guetwifi is not running")
+    runner_pids = _get_pid()
+    if runner_pids:
+        click.echo("guetwifi is running")
+        click.echo("pid: {}".format(runner_pids))
+    else:
+        click.echo("guetwifi is not running")
 
 
 @guetwifi.command()
-def upgrade():
-    """Upgrade guetwifi"""
-    click.echo("Upgrade guetwifi...")
-    _stop()
-    cmd = "pip install guetwifi --upgrade"
-    subprocess.Popen(cmd, shell=True)
-    _start()
-
-
-@guetwifi.command()
-def uninstall():
-    """Uninstall guetwifi"""
-    click.echo("Uninstall guetwifi...")
-    _stop()
-    cmd = "pip uninstall guetwifi"
-    subprocess.Popen(cmd, shell=True)
+@click.option("-n", "--number", default=10, help="The number of log")
+def log(number):
+    """Show guetwifi log"""
+    log_path = os.path.join(_path, "network.log")
+    if os.path.exists(log_path):
+        with open(log_path, "r") as f:
+            lines = f.readlines()
+            if len(lines) > number:
+                lines = lines[-number:]
+            for line in lines:
+                click.echo(line, nl=False)
+    else:
+        click.echo("No log file found")
 
 
 @guetwifi.command()
@@ -141,8 +137,10 @@ def config(account, password, operator):
     with open(config_path, "w") as f:
         json.dump(config, f)
 
+
 def main():
     guetwifi()
+
 
 if __name__ == "__main__":
     guetwifi()

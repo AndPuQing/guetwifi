@@ -1,12 +1,15 @@
+#!/usr/bin/env python
+# coding:utf-8
+
 import requests
 import re
 import time
 import logging
 import os
 import json
-import platform
 import subprocess
 import click
+
 _path = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -106,10 +109,10 @@ class NetWork:
     @staticmethod
     def checkNet():
         # ping www.baidu.com
-        command = "ping -c 5 www.baidu.com" if platform.system() == "Darwin" else "ping -n 5 www.baidu.com"
+        command = "ping -c 5 www.baidu.com"
         res = subprocess.run(command, shell=True)
         return res.returncode == 0
-    
+
     def run(self):
         while True:
             if not self.checkNet():
@@ -119,5 +122,5 @@ class NetWork:
 
 
 if __name__ == "__main__":
-    net = NetWork()
-    net.run()
+    network = NetWork()
+    network.run()
