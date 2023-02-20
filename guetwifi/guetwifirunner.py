@@ -15,7 +15,7 @@ _path = os.path.dirname(os.path.abspath(__file__))
 
 class NetWorkConnectLog:
     def __init__(self, log_file) -> None:
-        self.log_file = log_file
+        self.log_file = os.path.join(_path, log_file)
         self.logger = logging.getLogger("NetWorkConnectLog")
         self.logger.setLevel(logging.DEBUG)
         self.formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -110,8 +110,14 @@ class NetWork:
     def checkNet():
         # ping www.baidu.com
         command = "ping -c 5 www.baidu.com"
-        res = subprocess.run(command, shell=True)
-        return res.returncode == 0
+        res = subprocess.Popen(
+            command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        res.wait()
+        if res.returncode == 0:
+            return True
+        else:
+            return False
 
     def run(self):
         while True:
