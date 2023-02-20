@@ -45,7 +45,7 @@ class NetWork:
                 try:
                     self.account = config["account"]
                     self.password = config["password"]
-                    self.operator = config["operator"]
+                    self.isp = config["isp"]
                 except KeyError:
                     click.echo("Please config your account and password")
 
@@ -77,7 +77,7 @@ class NetWork:
         pararms = {
             "callback": "dr1003",
             "login_method": "1",
-            "user_account": f",0,{self.account}@{self.operator}",
+            "user_account": f",0,{self.account}@{self.isp}",
             "user_password": self.password,
             "wlan_user_ip": self.wlan_user_ip,
             "wlan_user_ipv6": "",

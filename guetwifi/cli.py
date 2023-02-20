@@ -125,10 +125,10 @@ def log(number):
 @guetwifi.command()
 @click.option("-a", "--account", default=None, help="Your GUET-WIFI account")
 @click.option("-p", "--password", default=None, help="Your GUET-WIFI password")
-@click.option("-o", "--operator", default="", help="Your want to login operator")
-def config(account, password, operator):
+@click.option("-i", "--isp", default="", help="Your want to login isp")
+def config(account, password, isp):
     """Config your GUET-WIFI account and password"""
-    config = {"account": account, "password": password, "operator": operator}
+    config = {"account": account, "password": password, "isp": isp}
     config = {k: v for k, v in config.items() if v is not None}
     config_path = os.path.join(_path, "config.json")
     if os.path.exists(config_path):
