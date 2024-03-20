@@ -9,6 +9,7 @@ import os
 import json
 import subprocess
 import click
+import base64
 
 _path = os.path.dirname(os.path.abspath(__file__))
 
@@ -32,10 +33,14 @@ class NetWork:
     def __init__(self) -> None:
         self._loadConfig()
         self.logger = NetWorkConnectLog("network.log").logger
+        self.logger.info(
+            f"Load config: account:{self.account},isp:{self.isp},password:{self.password}"
+        )
         self.wlan_user_ip = ""
         self.wlan_ac_ip = ""
         self.wlan_user_mac = ""
         self.base_url = "http://10.0.1.5:801/eportal/portal/login"
+        self.session = requests.Session()
 
     def _loadConfig(self):
         config_path = os.path.join(_path, "config.json")
@@ -45,6 +50,8 @@ class NetWork:
                 try:
                     self.account = config["account"]
                     self.password = config["password"]
+                    # base64 encode
+                    self.password = base64.b64encode(self.password.encode()).decode()
                     self.isp = config["isp"]
                 except KeyError:
                     click.echo("Please config your account and password")
@@ -56,7 +63,7 @@ class NetWork:
             "User-Agent": "Microsoft NCSI",
             "Host": "www.msftconnecttest.com",
         }
-        res = requests.get(URL, headers=HEADERS, allow_redirects=False)
+        res = self.session.get(URL, headers=HEADERS, allow_redirects=False)
         html = res.text
         pattern = r"wlanuserip=([\d\.]+).*?wlanacip=([\d\.]+).*?wlanusermac=([\w\-]+)"
         m = re.search(pattern, html)
@@ -86,7 +93,7 @@ class NetWork:
             "wlan_ac_name": "HJ-BRAS-ME60-01",
         }
         self.logger.debug(f"Login params:{pararms}")
-        res = requests.get(self.base_url, params=pararms)
+        res = self.session.get(self.base_url, params=pararms)
         self.logger.debug(f"Login response:{res.text}")
         if self.checkResult(res.text):
             self.logger.info("Login success")

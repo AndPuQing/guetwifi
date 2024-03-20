@@ -108,7 +108,7 @@ def status():
 
 @guetwifi.command()
 @click.option("-n", "--number", default=10, help="The number of log")
-def log(number):
+def log(number: int):
     """Show guetwifi log"""
     log_path = os.path.join(_path, "network.log")
     if os.path.exists(log_path):
@@ -123,10 +123,16 @@ def log(number):
 
 
 @guetwifi.command()
-@click.option("-a", "--account", default=None, help="Your GUET-WIFI account")
+@click.option("-a", "--account", default=None, help="Your GUET-WIFI account", type=int)
 @click.option("-p", "--password", default=None, help="Your GUET-WIFI password")
-@click.option("-i", "--isp", default="", help="Your want to login isp")
-def config(account, password, isp):
+@click.option(
+    "-i",
+    "--isp",
+    default="",
+    type=click.Choice(["cmcc", "unicom", "telecom", ""], case_sensitive=False),
+    help="Your want to login isp",
+)
+def config(account: int, password: str, isp: str):
     """Config your GUET-WIFI account and password"""
     config = {"account": account, "password": password, "isp": isp}
     config = {k: v for k, v in config.items() if v is not None}
